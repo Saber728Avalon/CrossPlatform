@@ -1,0 +1,53 @@
+project ( CrossPlatform 
+	LANGUAGES C CXX)
+cmake_minimum_required ( VERSION 2.8 )
+
+OPTION(BUUILD_MT_CODE "create md code" ON)
+
+#不是debug,也不是release。强制转为debug
+if (NOT CMAKE_BUILD_TYPE MATCHES "Debug" AND NOT CMAKE_BUILD_TYPE MATCHES "Debug")
+	set(CMAKE_BUILD_TYPE "CMAKE_BUILD_TYPE Debug")
+endif()
+
+IF(MSVC)
+	IF (BUUILD_MT_CODE)
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+		set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+		set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+		
+		#有可能原来存在，因此需要在做一次替换
+	ELSE()
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
+		set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
+		set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
+	ENDIF()
+ENDIF()
+
+MESSAGE(STATUS "value=${CMAKE_CXX_FLAGS_DEBUG}") 
+
+#设置输出lib的目录
+if (MSVC)
+	IF(CMAKE_BUILD_TYPE MATCHES "Release")
+		set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/bin")
+	ELSEIF(CMAKE_BUILD_TYPE MATCHES "Debug")
+	#设置lib的查找路径
+		set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/bin")
+	ELSE()
+		message(STATUS "Not Support Type")
+	ENDIF()
+else()
+	IF(CMAKE_BUILD_TYPE MATCHES "Release")
+		set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/bin/Release")
+	ELSEIF(CMAKE_BUILD_TYPE MATCHES "Debug")
+	#设置lib的查找路径
+		set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/bin/Debug")
+	ELSE()
+		message(STATUS "Not Support Type")
+	ENDIF()
+endif()
+
+add_subdirectory(src)
+add_subdirectory(Test)
+
