@@ -20,6 +20,9 @@
 	#include <stdlib.h>
 	#include <stdint.h>
 	#include <jni.h>
+#elif defined(__linux__)
+	#include <uuid/uuid.h>
+	#include <limits.h>
 #else
 	#include <uuid/uuid.h>
 #endif// _WIN32 || _WIN64
@@ -27,6 +30,32 @@
 #ifdef SendMessage
 	#undef SendMessage
 #endif
+
+#if defined(_WIN32) || defined(_WIN64)
+	#define DQ_MAX_PATH MAX_PATH
+	#if defined(_UNICODE)
+		#define DQStr(XXXX) L##XXXX
+	#else
+		#define DQStr(XXXX) XXXX
+	#endif
+#elif defined(__linux__)
+	#define DQStr(XXXX) XXXX
+	#define DQ_MAX_PATH PATH_MAX
+#else
+	#define DQStr(XXXX) XXXX
+#define DQ_MAX_PATH 256
+#endif
+
+/*
+* 循环右移，适用于32bit程序
+*/
+#define ROR32(no, bit) (((no) >> ((bit)%0x20)) | ((no) << (0x20 - ((bit)%0x20))))
+
+/*
+* 循环左移，适用于32bit程序
+*/
+#define ROL32(no, bit) (((no) << ((bit)%0x20)) | ((no) >> (0x20 - ((bit)%0x20))))
+
 
 /**
 	* @brief     安全释放内存
@@ -213,4 +242,29 @@ static void DQSleep(uint32_t unSleep)
 	
 
 	return;
+}
+
+/**
+	* @brief     得到零时目录
+	* @note      
+	* @returns   std::string
+	* @code      
+	* @endcode    
+	* @since     2021/08/18
+*/
+static std::string DQGetTempPath()
+{
+	std::string strRst;
+#if defined(_WIN32) || defined(_WIN64)
+	char chBuf[MAX_PATH] = {0};
+	GetTempPath(MAX_PATH, chBuf);
+	strRst = chBuf;
+#elif defined(__linux__)
+	strRst = "/tmp/";
+#elif defined(__APPLE__)
+	strRst = "/tmp/";
+#else 
+#error "Not Support";
+#endif
+	return strRst;
 }

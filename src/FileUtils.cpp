@@ -2,14 +2,18 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <iostream>
+#include <string.h>
 
 #if  defined(_WIN32) || defined(_WIN64)
+	#include <Windows.h>
+	#include <Shlwapi.h>
 	#include <direct.h>
 	#include <io.h>
 #if _MSC_VER <=1800
 	#include <sys/stat.h>
 	#include <string>
 #endif
+#pragma comment(lib, "Shlwapi.lib")
 #else
 	#include <dirent.h>
 	#include <unistd.h>
@@ -41,6 +45,10 @@ FILE* FileUtils::FileOpenAsc(const char *pszFilePath, FileMode mode)
 	{
 		pFile = fopen(pszFilePath, "ab+");
 	}
+	else if (FileMode::readAndWriteMode == mode)
+	{
+		pFile = fopen(pszFilePath, "rb+");
+	}
 	else
 	{
 		return pFile;
@@ -49,7 +57,7 @@ FILE* FileUtils::FileOpenAsc(const char *pszFilePath, FileMode mode)
 }
 
 #if defined(_WIN32) ||defined(_WIN64)
-FILE* FileUtils::FileOpenUni(const wchar_t *pszFilePath, FileMode mode /*= FileMode::readMode*/)
+FILE* FileUtils::FileOpenUni(const FILE_UNI_CHAR_KEYWORD *pszFilePath, FileMode mode /*= FileMode::readMode*/)
 {
 	FILE *pFile = NULL;
 	if (FileMode::readMode == mode)
@@ -64,6 +72,10 @@ FILE* FileUtils::FileOpenUni(const wchar_t *pszFilePath, FileMode mode /*= FileM
 	{
 		pFile = _wfopen(pszFilePath, L"ab+");
 	}
+	else if (FileMode::readAndWriteMode == mode)
+	{
+		pFile = _wfopen(pszFilePath, L"rb+");
+	}
 	else
 	{
 		return pFile;
@@ -71,7 +83,7 @@ FILE* FileUtils::FileOpenUni(const wchar_t *pszFilePath, FileMode mode /*= FileM
 	return pFile;
 }
 #else
-#error "Not Support"
+//#error "Not Support"
 #endif
 
 std::string FileUtils::GetCurDir()
@@ -100,7 +112,7 @@ bool FileUtils::CreateDir(char *pszDir)
 	return 0 == nRet;
 }
 
-bool FileUtils::CreateDirs(char *pszDir)
+bool FileUtils::CreateDirs(const char *pszDir)
 {
 	int nRet = 0;
 	int nSize = strlen(pszDir);
@@ -119,17 +131,32 @@ bool FileUtils::CreateDirs(char *pszDir)
 		}
 
 	}
+
+	//避免末尾没有/就不创建目录
+#if defined(_WIN32) || defined(_WIN64)
+	nRet = mkdir(pszDir);
+#else
+	nRet = mkdir(pszDir, S_IRWXU | S_IRWXG | S_IRWXO);
+#endif
 	delete[] pChTmpBuf;
 	pChTmpBuf = NULL;
 	return 0 == nRet;
 }
 
-bool FileUtils::FileIsExist(char *pszFilePath)
+bool FileUtils::FileIsExistAsc(const char *pszFilePath)
 {
 	struct stat statBuf;
 	return (stat(pszFilePath, &statBuf) == 0);
 }
 
+#if defined(_WIN32) ||defined(_WIN64)
+bool FileUtils::FileIsExistUni(const FILE_UNI_CHAR_KEYWORD *pszFilePath)
+{
+	return PathFileExistsW(pszFilePath);
+}
+#else
+//#error "Not Support"
+#endif
 
 bool FileUtils::FileDelete(const char *pszFilePath)
 {
@@ -264,9 +291,54 @@ uint64_t FileUtils::FileSize(FILE *pFile)
 	return nFileSize;
 }
 
-int FileUtils::FileClose(FILE *pFile)
+int FileUtils::FileClose(FILE *&pFile)
 {
-	return fclose(pFile);
+	int nRet =  fclose(pFile);
+	if (0 == nRet)
+	{
+		pFile = NULL;
+	}
+	return  nRet;
+}
+
+int FileUtils::FileSeek(FILE *pFile, int32_t unPos, SeekMode nMode)
+{
+	int nSeekMode = 0;
+	if (SeekMode::SeekModeBegin == nMode)
+	{
+		nSeekMode = SEEK_SET;
+		if (unPos < 0)//开始位置，这里肯定不能再往前了
+		{
+			return -1;
+		}
+	}
+	else if (SeekMode::SeekModeCur == nMode)
+	{
+		nSeekMode = SEEK_CUR;
+	}
+	else if (SeekMode::SeekModeEnd == nMode)
+	{
+		if (unPos > 0)//事实上API是允许unpos>0，这代表将文件扩大.统一标准，这里不允许，避免逻辑问题
+		{
+			return -1;
+		}
+		nSeekMode = SEEK_END;
+	}
+	else
+	{
+		return -1;
+	}
+
+#if defined(_WIN32) || defined(_WIN64)
+	return _fseeki64(pFile, unPos, nSeekMode);
+#else
+	return fseeko(pFile, unPos, nSeekMode);
+#endif
+}
+
+int FileUtils::FileFlush(FILE *pFile)
+{
+	return fflush(pFile);
 }
 
 int FileUtils::DirList(std::vector<std::string> &rstVect, const char* pszSrcDirPath, const char *pszExt)
@@ -305,7 +377,7 @@ int FileUtils::DirList(std::vector<std::string> &rstVect, const char* pszSrcDirP
 			{
 				continue;
 			}
-			if (0 != strcmp(fileDir.name + nDNameLen - nLenExt, pszExt))
+			if (0 != stricmp(fileDir.name + nDNameLen - nLenExt, pszExt))
 			{
 				continue;
 			}

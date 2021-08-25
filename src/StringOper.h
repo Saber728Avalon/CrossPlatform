@@ -21,7 +21,7 @@
 #elif defined(__linux__)
 #define UNI_CHAR_KEYWORD wchar_t
 #elif defined(__unix__)
-#define UNI_CHAR_KEYWORD short
+#define UNI_CHAR_KEYWORD wchar_t
 #else
 #pragma error "Not Support"
 #endif
@@ -356,6 +356,58 @@ public:
 		* @since     2021/07/02
 	*/
 	static std::wstring  CppAndCStrUni(const std::wstring & strSrc);
+
+
+	/**
+		* @brief     string 转换为 wstring 
+		* @note      
+		* @returns   std::wstring
+		* @param[in] const char * pc
+		* @code      
+		* @endcode    
+		* @since     2021/08/18
+	*/
+	static std::wstring c2w(const char *pc);
+
+
+	/**
+		* @brief     wstring 转换为 string
+		* @note      
+		* @returns   std::string
+		* @param[in] const UNI_CHAR_KEYWORD * pw
+		* @code      
+		* @endcode    
+		* @since     2021/08/18
+	*/
+	static std::string w2c(const UNI_CHAR_KEYWORD * pw);
+
+
+	/**
+		* @brief     不区分大小写比较字符串
+		* @note      
+		* @returns   int
+		* @param[in] const char * pszSrc
+		* @param[in] const char * pszDst
+		* @code      
+		* @endcode    
+		* @since     2021/08/24
+	*/
+	static int stricmp(const char *pszSrc, const char *pszDst);
+
+
+	/**
+		* @brief      不区分大小写比较字符串
+		* @note      
+		* @returns   int
+		* @param[in] const char * pszSrc
+		* @param[in] const char * pszDst
+		* @param[in] int nLen
+		* @code      
+		* @endcode    
+		* @since     2021/08/24
+	*/
+	static int strnicmp(const char *pszSrc, const char *pszDst, int nLen);
+
 private:
 	StringOper();
 };

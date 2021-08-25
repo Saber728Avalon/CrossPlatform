@@ -13,6 +13,21 @@
 #include <vector>
 #include <stdint.h>
 
+
+//这里要注意windows使用的utf-16,  mac linux用的utf-32
+#ifdef _WIN32
+#define FILE_UNI_CHAR_KEYWORD wchar_t
+#elif defined(__APPLE__)
+#define FILE_UNI_CHAR_KEYWORD wchar_t
+#elif defined(__linux__)
+#define FILE_UNI_CHAR_KEYWORD wchar_t
+#elif defined(__unix__)
+#define FILE_UNI_CHAR_KEYWORD wchar_t
+#else
+#pragma error "Not Support"
+#endif
+
+
 class FileUtils
 {
 public:
@@ -20,7 +35,19 @@ public:
 	{
 		readMode,
 		newWriteMode,
-		endWriteMode
+		endWriteMode,
+		readAndWriteMode,
+
+		FileModeCount
+	};
+
+	enum SeekMode
+	{
+		SeekModeCur,
+		SeekModeEnd,
+		SeekModeBegin,
+
+		SeekModeCount
 	};
 
 	~FileUtils();
@@ -38,9 +65,9 @@ public:
 	static FILE* FileOpenAsc(const char *pszFilePath, FileMode mode = FileMode::readMode);
 
 #if defined(_WIN32) ||defined(_WIN64)
-	static FILE* FileOpenUni(const wchar_t *pszFilePath, FileMode mode = FileMode::readMode);
+	static FILE* FileOpenUni(const FILE_UNI_CHAR_KEYWORD *pszFilePath, FileMode mode = FileMode::readMode);
 #else
-#error "Not Support"
+//#error "Not Support"
 #endif
 
 
@@ -93,7 +120,33 @@ public:
 		* @endcode    
 		* @since      2019/08/28
 	*/
-	static int FileClose(FILE *pFile);
+	static int FileClose(FILE * &pFile);
+
+
+	/**
+		* @brief     移动文件浮标
+		* @note      
+		* @returns   成功返回0，失败返回非0
+		* @param[in] FILE * pFile
+		* @param[in] int32_t unPos
+		* @param[in] SeekMode seekMode
+		* @code      
+		* @endcode    
+		* @since     2021/08/18
+	*/
+	static int FileSeek(FILE *pFile, int32_t unPos, SeekMode seekMode);
+
+
+	/**
+		* @brief     将文件数据写入文件
+		* @note      
+		* @returns   int
+		* @param[in] FILE * pFile
+		* @code      
+		* @endcode    
+		* @since     2021/08/19
+	*/
+	static int FileFlush(FILE *pFile);
 
 
 	/**
@@ -127,7 +180,7 @@ public:
 		* @endcode    
 		* @since     2020/09/03
 	*/
-	static bool CreateDirs(char *pszDir);
+	static bool CreateDirs(const char *pszDir);
 
 
 
@@ -140,8 +193,12 @@ public:
 		* @endcode    
 		* @since     2019/08/28
 	*/
-	static bool FileIsExist(char *pszFilePath);
-
+	static bool FileIsExistAsc(const char *pszFilePath);
+#if defined(_WIN32) ||defined(_WIN64)
+	static bool FileIsExistUni(const FILE_UNI_CHAR_KEYWORD *pszFilePath);
+#else
+//#error "Not Support"
+#endif
 
 	/**
 		* @brief     删除文件
@@ -206,7 +263,26 @@ public:
 		* @since     2021/01/13
 	*/
 	static int FileRename(const char *pszOldName, const char *pszNewName); 
+
 private:
 	FileUtils();
 };
 
+class FileUtilsClose
+{
+public:
+	FileUtilsClose(FILE *&pFile):m_pFile(pFile)
+	{
+	}
+	~FileUtilsClose() 
+	{
+		if (NULL != m_pFile)
+		{
+			FileUtils::FileClose(m_pFile);
+			m_pFile = NULL;
+		}
+	}
+
+private:
+	FILE* &m_pFile;
+};

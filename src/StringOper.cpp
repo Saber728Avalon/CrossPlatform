@@ -488,8 +488,8 @@ std::wstring StringOper::CppAndCStrUni(const std::wstring & strSrc)
 
 	strTmpDst.reserve(strSrc.size() + 2);
 	strTmpDst.resize(strSrc.size());
-	wchar_t *pChTmpSrc = (wchar_t *)strSrc.data();
-	wchar_t *pChTmpDst = (wchar_t *)strTmpDst.data();
+	UNI_CHAR_KEYWORD *pChTmpSrc = (UNI_CHAR_KEYWORD *)strSrc.data();
+	UNI_CHAR_KEYWORD *pChTmpDst = (UNI_CHAR_KEYWORD *)strTmpDst.data();
 	for (i = 0; i < strSrc.size(); i++)
 	{
 		if ('\0' == pChTmpSrc[i])
@@ -502,3 +502,110 @@ std::wstring StringOper::CppAndCStrUni(const std::wstring & strSrc)
 	pChTmpDst[i++] = '\0';
 	return std::move(strTmpDst);
 }
+
+
+std::wstring StringOper::c2w(const char *pc)
+{
+	std::wstring val = L"";
+
+	if(NULL == pc)
+	{
+		return val;
+	}
+	//size_t size_of_ch = strlen(pc)*sizeof(char);
+	//size_t size_of_wc = get_wchar_size(pc);
+	size_t size_of_wc;
+	size_t destlen = mbstowcs(0,pc,0);
+	if (destlen ==(size_t)(-1))
+	{
+		return val;
+	}
+	size_of_wc = destlen+1;
+	UNI_CHAR_KEYWORD * pw  = new UNI_CHAR_KEYWORD[size_of_wc];
+	mbstowcs(pw,pc,size_of_wc);
+	val = pw;
+	delete pw;
+	return val;
+}
+
+std::string StringOper::w2c(const UNI_CHAR_KEYWORD * pw)
+{
+	std::string val = "";
+	if(!pw)
+	{
+		return val;
+	}
+
+	size_t size= wcslen(pw)*sizeof(UNI_CHAR_KEYWORD);
+
+	char *pc = NULL;
+	if(!(pc = (char*)malloc(size)))
+	{
+		return val;
+	}
+	memset(pc, 0, size);
+	setlocale(LC_ALL, "");
+	size_t destlen = wcstombs(pc,pw,size);
+	setlocale(LC_ALL, "C");
+	/*转换不为空时，返回值为-1。如果为空，返回值0*/
+	if (destlen ==(size_t)(0))
+	{
+		return val;
+	}
+	val = pc;
+	delete pc;
+	return val;
+}
+
+int StringOper::stricmp(const char *pszSrc, const char *pszDst)
+{
+#if defined(_WIN32) || defined(_WIN64)
+	return stricmp(pszSrc, pszDst);
+#elif defined(__linux__)
+	return strcasecmp(pszSrc, pszDst);
+#else
+	const unsigned char *ua = (const unsigned char *)a;
+	const unsigned char *ub = (const unsigned char *)b;
+
+	if (((const char *)0 == a) || (const char *)0 == b)
+		return int(a - b);
+
+	while ((uc[*ua] == uc[*ub]) && ('\0' != *a))
+	{
+		a++;
+		ua++;
+		ub++;
+	}
+
+	return int(uc[*ua] - uc[*ub]);
+#endif
+}
+
+int StringOper::strnicmp(const char *pszSrc, const char *pszDst, int nLen)
+{
+
+#if defined(_WIN32) || defined(_WIN64)
+	return strnicmp(pszSrc, pszDst, nLen);
+#elif defined(__linux__)
+	return strncasecmp(pszSrc, pszDst, nLen);
+#else
+	const unsigned char *ua = (const unsigned char *)a;
+	const unsigned char *ub = (const unsigned char *)b;
+
+	if (((const char *)0 == a) || (const char *)0 == b)
+		return int(a - b);
+
+	while (max && (uc[*ua] == uc[*ub]) && ('\0' != *a))
+	{
+		a++;
+		ua++;
+		ub++;
+		nLen--;
+	}
+
+	if (0 == max) return 0;
+
+	return int(uc[*ua] - uc[*ub]);
+#endif
+}
+
