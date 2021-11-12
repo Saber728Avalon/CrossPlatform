@@ -71,6 +71,20 @@ public:
 #endif
 
 
+
+	/**
+		* @brief     打开并且读取文件,读取完成之后关闭读写
+		* @note      
+		* @returns   int
+		* @param[in] const char * pszFilePath
+		* @param[in] std::string & binFileData
+		* @code      
+		* @endcode    
+		* @since     2021/09/06
+	*/
+	static int FileOpenAndRead(const char *pszFilePath, std::string &binFileData);
+
+
 	/**
 		* @brief     写文件
 		* @note      

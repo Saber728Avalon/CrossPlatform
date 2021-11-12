@@ -277,6 +277,11 @@ std::wstring StringOper::FormatUni(const UNI_CHAR_KEYWORD *fmt, ...)
 
 std::string StringOper::LeftTrimAsc(const std::string strSrc)
 {
+	if (strSrc.empty())
+	{
+		return strSrc;
+	}
+	
 	int i = 0;
 	for (; i < strSrc.length(); i++)
 	{
@@ -291,6 +296,10 @@ std::string StringOper::LeftTrimAsc(const std::string strSrc)
 
 std::string StringOper::RightTrimAsc(const std::string strSrc)
 {
+	if (strSrc.empty())
+	{
+		return strSrc;
+	}
 	int i = strSrc.length() - 1;
 	for (; i >= 0; i--)
 	{
@@ -305,6 +314,11 @@ std::string StringOper::RightTrimAsc(const std::string strSrc)
 
 std::wstring StringOper::LeftTrimUni(const std::wstring strSrc)
 {
+	if (strSrc.empty())
+	{
+		return strSrc;
+	}
+	
 	int i = 0;
 	for (; i < strSrc.length(); i++)
 	{
@@ -319,6 +333,11 @@ std::wstring StringOper::LeftTrimUni(const std::wstring strSrc)
 
 std::wstring StringOper::RightTrimUni(const std::wstring strSrc)
 {
+	if (strSrc.empty())
+	{
+		return strSrc;
+	}
+	
 	int i = strSrc.length() - 1;
 	for (; i >= 0; i--)
 	{
@@ -553,7 +572,7 @@ std::string StringOper::w2c(const UNI_CHAR_KEYWORD * pw)
 		return val;
 	}
 	val = pc;
-	delete pc;
+	free(pc);
 	return val;
 }
 

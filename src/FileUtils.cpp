@@ -265,6 +265,37 @@ bool FileUtils::DirCopy(const char *pszSrcDirPath, const char *pszDstDirPath)
 		return true;
 }
 
+int FileUtils::FileOpenAndRead(const char *pszFilePath, std::string &binFileData)
+{
+	FILE *pFile = FileOpenAsc(pszFilePath, FileMode::readMode);
+	if (NULL == pFile)
+	{
+		return -1;
+	}
+	uint64_t un64Size = FileSize(pFile);
+	if (0 == un64Size)
+	{
+		FileClose(pFile);
+		return -2;
+	}
+	binFileData.resize(un64Size);
+	if (un64Size != binFileData.size())
+	{
+		FileClose(pFile);
+		return -3;
+	}
+
+	uint32_t nRead = FileRead(pFile, (unsigned char *)binFileData.data(), un64Size);
+	if (nRead != un64Size)
+	{
+		FileClose(pFile);
+		return -4;
+	}
+
+	FileClose(pFile);
+	return 0;
+}
+
 uint32_t FileUtils::FileWrite(const FILE *pFile, const unsigned char *pData, const uint32_t nDataLen)
 {
 	return fwrite(pData, 1, nDataLen, (FILE *)pFile);
