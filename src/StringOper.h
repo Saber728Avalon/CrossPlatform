@@ -287,7 +287,7 @@ public:
 	
 	/**
 		* @brief     ascii字符串进行替换
-		* @note      
+		* @note      如果没有可以替换的目标串，则不会替换
 		* @returns   替换结果
 		* @param[in] strSrc 替换的原始字符串
 		* @param[in] strObj 替换的目标串
@@ -298,9 +298,23 @@ public:
 	*/
 	static std::string ReplaceAsc(std::string strSrc, std::string strObj, std::string strReplace);
 
+
+	/**
+		* @brief     ascii字符串进行替换,但是只是替换一次
+		* @note       如果没有可以替换的目标串，则不会替换
+		* @returns   替换结果
+		* @param[in] strSrc 替换的原始字符串
+		* @param[in] strObj 替换的目标串
+		* @param[in] strReplace 替换的结果串
+		* @code      
+		* @endcode    
+		* @since     2021/11/30
+	*/
+	static std::string ReplaceFirstAsc(std::string strSrc, std::string strObj, std::string strReplace);
+
 	/**
 	* @brief     unicode字符串进行替换
-	* @note
+	* @note		 如果没有可以替换的目标串，则不会替换
 	* @returns   替换结果
 	* @param[in] strSrc 替换的原始字符串
 	* @param[in] strObj 替换的目标串
@@ -310,6 +324,19 @@ public:
 	* @since     2020/12/08
 	*/
 	static std::wstring ReplaceUni(std::wstring strSrc, std::wstring strObj, std::wstring strReplace);
+
+	/**
+	* @brief     unicode字符串进行替换,但是只是替换一次
+	* @note		 如果没有可以替换的目标串，则不会替换
+	* @returns   替换结果
+	* @param[in] strSrc 替换的原始字符串
+	* @param[in] strObj 替换的目标串
+	* @param[in] strReplace 替换的结果串
+	* @code
+	* @endcode
+	* @since     2020/12/08
+	*/
+	static std::wstring ReplaceFirstUni(std::wstring strSrc, std::wstring strObj, std::wstring strReplace);
 
 
 	/**
@@ -392,7 +419,7 @@ public:
 		* @endcode    
 		* @since     2021/08/24
 	*/
-	static int stricmp(const char *pszSrc, const char *pszDst);
+	static int StrNiCmp(const char *pszSrc, const char *pszDst);
 
 
 	/**
@@ -406,7 +433,7 @@ public:
 		* @endcode    
 		* @since     2021/08/24
 	*/
-	static int strnicmp(const char *pszSrc, const char *pszDst, int nLen);
+	static int StrNiCmp(const char *pszSrc, const char *pszDst, int nLen);
 
 private:
 	StringOper();

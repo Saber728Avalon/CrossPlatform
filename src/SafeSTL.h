@@ -38,6 +38,11 @@ namespace Duan
 			return ptrMsg;
 		}
 
+		int GetCount()
+		{
+			return m_ptrMsgQueue.size();
+		}
+
 	private:
 		std::queue<std::shared_ptr<T>> m_ptrMsgQueue;
 		std::mutex m_mutex;

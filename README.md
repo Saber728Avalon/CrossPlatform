@@ -18,7 +18,7 @@ DuanThread		跨平台创建线程
 DuanThreadPool	基于DuanThread 简单的线程池     
 DuanTime		一些常用的时间函数     
 endian			处理机器大小端问题的函数      
-FileUtils		常见的文件操作函数     
+FileUtils		常见的文件操作函数,支持使用win32 API的模式     
 LoadLib			跨平台的动态库加载和使用     
 NumberOper		常见的数字处理     
 Reflection		C++实现反射（但是我没有找到合适的实现，就只是写了点日志给大家思路）     

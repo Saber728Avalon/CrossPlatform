@@ -412,6 +412,20 @@ std::string StringOper::ReplaceAsc(std::string strSrc, std::string strObj, std::
 	return strSrc;
 }
 
+std::string StringOper::ReplaceFirstAsc(std::string strSrc, std::string strObj, std::string strReplace)
+{
+	for (std::string::size_type pos(0); pos != std::string::npos; pos += strReplace.length())
+	{
+		if ((pos = strSrc.find(strObj, pos)) != std::string::npos)
+		{
+			strSrc.replace(pos, strObj.length(), strReplace);
+			break;
+		}
+	}
+	return strSrc;
+}
+
+
 std::wstring StringOper::ReplaceUni(std::wstring strSrc, std::wstring strObj, std::wstring strReplace)
 {
 	for (std::wstring::size_type pos(0); pos != std::wstring::npos; pos += strReplace.length())
@@ -423,6 +437,20 @@ std::wstring StringOper::ReplaceUni(std::wstring strSrc, std::wstring strObj, st
 	}
 	return strSrc;
 }
+
+std::wstring StringOper::ReplaceFirstUni(std::wstring strSrc, std::wstring strObj, std::wstring strReplace)
+{
+	for (std::wstring::size_type pos(0); pos != std::wstring::npos; pos += strReplace.length())
+	{
+		if ((pos = strSrc.find(strObj, pos)) != std::string::npos)
+		{
+			strSrc.replace(pos, strObj.length(), strReplace);
+			break;
+		}
+	}
+	return strSrc;
+}
+
 
 bool StringOper::IsDigitalAsc(const std::string &strSrc)
 {
@@ -569,6 +597,7 @@ std::string StringOper::w2c(const UNI_CHAR_KEYWORD * pw)
 	/*转换不为空时，返回值为-1。如果为空，返回值0*/
 	if (destlen ==(size_t)(0))
 	{
+		free(pc);
 		return val;
 	}
 	val = pc;
@@ -576,7 +605,7 @@ std::string StringOper::w2c(const UNI_CHAR_KEYWORD * pw)
 	return val;
 }
 
-int StringOper::stricmp(const char *pszSrc, const char *pszDst)
+int StringOper::StrNiCmp(const char *pszSrc, const char *pszDst)
 {
 #if defined(_WIN32) || defined(_WIN64)
 	return stricmp(pszSrc, pszDst);
@@ -600,7 +629,7 @@ int StringOper::stricmp(const char *pszSrc, const char *pszDst)
 #endif
 }
 
-int StringOper::strnicmp(const char *pszSrc, const char *pszDst, int nLen)
+int StringOper::StrNiCmp(const char *pszSrc, const char *pszDst, int nLen)
 {
 
 #if defined(_WIN32) || defined(_WIN64)

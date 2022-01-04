@@ -15,16 +15,25 @@
 
 
 //这里要注意windows使用的utf-16,  mac linux用的utf-32
-#ifdef _WIN32
-#define FILE_UNI_CHAR_KEYWORD wchar_t
+#if  defined(_WIN32) || defined(_WIN64)
+	#define FILE_UNI_CHAR_KEYWORD wchar_t
+	#if defined(_USE_WIN32_API) //使用win32的API，可以降低代码尺寸
+	#include <Windows.h>
+	#define DQFILE HANDLE
+	#else
+	#define DQFILE FILE*
+	#endif
 #elif defined(__APPLE__)
-#define FILE_UNI_CHAR_KEYWORD wchar_t
+	#define FILE_UNI_CHAR_KEYWORD wchar_t
+	#define DQFILE FILE*
 #elif defined(__linux__)
-#define FILE_UNI_CHAR_KEYWORD wchar_t
+	#define FILE_UNI_CHAR_KEYWORD wchar_t
+	#define DQFILE FILE*
 #elif defined(__unix__)
-#define FILE_UNI_CHAR_KEYWORD wchar_t
+	#define FILE_UNI_CHAR_KEYWORD wchar_t
+	#define DQFILE FILE*
 #else
-#pragma error "Not Support"
+	#pragma error "Not Support"
 #endif
 
 
@@ -62,10 +71,10 @@ public:
 		* @endcode    
 		* @since      2019/08/28
 	*/
-	static FILE* FileOpenAsc(const char *pszFilePath, FileMode mode = FileMode::readMode);
+	static DQFILE FileOpenAsc(const char *pszFilePath, FileMode mode = FileMode::readMode);
 
 #if defined(_WIN32) ||defined(_WIN64)
-	static FILE* FileOpenUni(const FILE_UNI_CHAR_KEYWORD *pszFilePath, FileMode mode = FileMode::readMode);
+	static DQFILE FileOpenUni(const FILE_UNI_CHAR_KEYWORD *pszFilePath, FileMode mode = FileMode::readMode);
 #else
 //#error "Not Support"
 #endif
@@ -82,7 +91,10 @@ public:
 		* @endcode    
 		* @since     2021/09/06
 	*/
-	static int FileOpenAndRead(const char *pszFilePath, std::string &binFileData);
+	static int FileOpenAndReadAsc(const char *pszFilePath, std::string &binFileData);
+#if defined(_WIN32) ||defined(_WIN64)
+	static int FileOpenAndReadUni(const FILE_UNI_CHAR_KEYWORD *pszFilePath, std::string &binFileData);
+#endif
 
 
 	/**
@@ -96,7 +108,7 @@ public:
 		* @endcode    
 		* @since      2019/08/28
 	*/
-	static uint32_t FileWrite(const FILE *pFile, const unsigned char *pData, const uint32_t nDataLen);
+	static uint32_t FileWrite(const DQFILE pFile, const unsigned char *pData, const uint32_t nDataLen);
 
 
 	/**
@@ -110,7 +122,7 @@ public:
 		* @endcode    
 		* @since      2019/08/28
 	*/
-	static uint32_t FileRead(FILE *pFile, unsigned char *pData, uint32_t nDataLen);
+	static uint32_t FileRead(DQFILE pFile, unsigned char *pData, uint32_t nDataLen);
 
 
 	/**
@@ -122,7 +134,7 @@ public:
 		* @endcode    
 		* @since      2019/08/28
 	*/
-	static uint64_t FileSize(FILE *pFile);
+	static uint64_t FileSize(DQFILE pFile);
 
 
 	/**
@@ -134,7 +146,7 @@ public:
 		* @endcode    
 		* @since      2019/08/28
 	*/
-	static int FileClose(FILE * &pFile);
+	static int FileClose(DQFILE &pFile);
 
 
 	/**
@@ -148,7 +160,7 @@ public:
 		* @endcode    
 		* @since     2021/08/18
 	*/
-	static int FileSeek(FILE *pFile, int32_t unPos, SeekMode seekMode);
+	static int FileSeek(DQFILE pFile, int32_t unPos, SeekMode seekMode);
 
 
 	/**
@@ -160,7 +172,7 @@ public:
 		* @endcode    
 		* @since     2021/08/19
 	*/
-	static int FileFlush(FILE *pFile);
+	static int FileFlush(DQFILE pFile);
 
 
 	/**
@@ -182,8 +194,10 @@ public:
 		* @endcode    
 		* @since     2019/08/28
 	*/
-	static bool CreateDir(char *pszDir);
-
+	static bool CreateDirAsc(char *pszDir);
+#if  (defined(_WIN32) || defined(_WIN64))
+	static bool CreateDirUni(FILE_UNI_CHAR_KEYWORD *pszDir);
+#endif
 
 	/**
 		* @brief     迭代创建目录，如果linux则创建所有用户都可以读写运行的目录 
@@ -194,7 +208,10 @@ public:
 		* @endcode    
 		* @since     2020/09/03
 	*/
-	static bool CreateDirs(const char *pszDir);
+	static bool CreateDirsAsc(const char *pszDir);
+#if  (defined(_WIN32) || defined(_WIN64))
+	static bool CreateDirsUni(const FILE_UNI_CHAR_KEYWORD *pszDir);
+#endif
 
 
 
@@ -223,7 +240,10 @@ public:
 		* @endcode    
 		* @since     2020/09/01
 	*/
-	static bool FileDelete(const char *pszFilePath);
+	static bool FileDeleteAsc(const char *pszFilePath);
+#if  (defined(_WIN32) || defined(_WIN64))
+	static bool FileDeleteUni(const FILE_UNI_CHAR_KEYWORD *pszFilePath);
+#endif
 
 
 
@@ -276,16 +296,19 @@ public:
 		* @endcode    
 		* @since     2021/01/13
 	*/
-	static int FileRename(const char *pszOldName, const char *pszNewName); 
+	static int FileRenameAsc(const char *pszOldName, const char *pszNewName); 
+#if  (defined(_WIN32) || defined(_WIN64))
+	static int FileRenameUni(const FILE_UNI_CHAR_KEYWORD *pszOldName, const FILE_UNI_CHAR_KEYWORD *pszNewName);
+#endif
 
 private:
-	FileUtils();
+	FileUtils();	
 };
 
 class FileUtilsClose
 {
 public:
-	FileUtilsClose(FILE *&pFile):m_pFile(pFile)
+	FileUtilsClose(DQFILE &pFile):m_pFile(pFile)
 	{
 	}
 	~FileUtilsClose() 
@@ -298,5 +321,5 @@ public:
 	}
 
 private:
-	FILE* &m_pFile;
+	DQFILE &m_pFile;
 };

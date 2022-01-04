@@ -9,6 +9,10 @@
 	#include <Shlwapi.h>
 	#include <direct.h>
 	#include <io.h>
+#if defined(_USE_WIN32_API)
+	#include <ShlObj.h>
+#endif
+
 #if _MSC_VER <=1800
 	#include <sys/stat.h>
 	#include <string>
@@ -30,24 +34,69 @@ FileUtils::~FileUtils()
 }
 
 
-FILE* FileUtils::FileOpenAsc(const char *pszFilePath, FileMode mode)
+DQFILE FileUtils::FileOpenAsc(const char *pszFilePath, FileMode mode)
 {
-	FILE *pFile = NULL;
+	DQFILE pFile = NULL;
 	if (FileMode::readMode == mode)
 	{
+#if (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+		pFile = CreateFileA(pszFilePath
+			, GENERIC_READ
+			, FILE_SHARE_READ
+			, NULL
+			, OPEN_EXISTING
+			, FILE_ATTRIBUTE_NORMAL
+			, NULL);
+#else
 		pFile = fopen(pszFilePath, "rb");
+#endif
+		
 	}
 	else if (FileMode::newWriteMode == mode)
 	{
+#if  (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+		pFile = CreateFileA(pszFilePath
+			, GENERIC_READ | GENERIC_WRITE
+			, FILE_SHARE_READ
+			, NULL
+			, CREATE_ALWAYS
+			, FILE_ATTRIBUTE_NORMAL
+			, NULL);
+#else
 		pFile = fopen(pszFilePath, "wb+");
+#endif
 	}
 	else if (FileMode::endWriteMode == mode)
 	{
+#if (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+		pFile = CreateFileA(pszFilePath
+			, GENERIC_READ | GENERIC_WRITE
+			, FILE_SHARE_READ
+			, NULL
+			, OPEN_ALWAYS
+			, FILE_ATTRIBUTE_NORMAL
+			, NULL);
+		if (FileSeek(pFile, 0, SeekMode::SeekModeEnd) < 0)
+		{
+			return 0;
+		}
+#else
 		pFile = fopen(pszFilePath, "ab+");
+#endif
 	}
 	else if (FileMode::readAndWriteMode == mode)
 	{
+#if  (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+		pFile = CreateFileA(pszFilePath
+			, GENERIC_READ | GENERIC_WRITE
+			, FILE_SHARE_READ
+			, NULL
+			, OPEN_ALWAYS
+			, FILE_ATTRIBUTE_NORMAL
+			, NULL);
+#else
 		pFile = fopen(pszFilePath, "rb+");
+#endif
 	}
 	else
 	{
@@ -57,24 +106,68 @@ FILE* FileUtils::FileOpenAsc(const char *pszFilePath, FileMode mode)
 }
 
 #if defined(_WIN32) ||defined(_WIN64)
-FILE* FileUtils::FileOpenUni(const FILE_UNI_CHAR_KEYWORD *pszFilePath, FileMode mode /*= FileMode::readMode*/)
+DQFILE FileUtils::FileOpenUni(const FILE_UNI_CHAR_KEYWORD *pszFilePath, FileMode mode /*= FileMode::readMode*/)
 {
-	FILE *pFile = NULL;
+	DQFILE pFile = NULL;
 	if (FileMode::readMode == mode)
 	{
+#if  (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+		pFile = CreateFileW(pszFilePath
+			, GENERIC_READ
+			, FILE_SHARE_READ
+			, NULL
+			, OPEN_EXISTING
+			, FILE_ATTRIBUTE_NORMAL
+			, NULL);
+#else
 		pFile = _wfopen(pszFilePath, L"rb");
+#endif
 	}
 	else if (FileMode::newWriteMode == mode)
 	{
+#if  (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+		pFile = CreateFileW(pszFilePath
+			, GENERIC_READ | GENERIC_WRITE
+			, FILE_SHARE_READ
+			, NULL
+			, CREATE_ALWAYS
+			, FILE_ATTRIBUTE_NORMAL
+			, NULL);
+#else
 		pFile = _wfopen(pszFilePath, L"wb+");
+#endif
 	}
 	else if (FileMode::endWriteMode == mode)
 	{
+#if  (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+		pFile = CreateFileW(pszFilePath
+			, GENERIC_READ | GENERIC_WRITE
+			, FILE_SHARE_READ
+			, NULL
+			, OPEN_ALWAYS
+			, FILE_ATTRIBUTE_NORMAL
+			, NULL);
+		if (FileSeek(pFile, 0, SeekMode::SeekModeEnd) < 0)
+		{
+			return 0;
+		}
+#else
 		pFile = _wfopen(pszFilePath, L"ab+");
+#endif
 	}
 	else if (FileMode::readAndWriteMode == mode)
 	{
+#if  (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+		pFile = CreateFileW(pszFilePath
+			, GENERIC_READ | GENERIC_WRITE
+			, FILE_SHARE_READ
+			, NULL
+			, OPEN_ALWAYS
+			, FILE_ATTRIBUTE_NORMAL
+			, NULL);
+#else
 		pFile = _wfopen(pszFilePath, L"rb+");
+#endif
 	}
 	else
 	{
@@ -101,19 +194,54 @@ std::string FileUtils::GetCurDir()
 }
 
 
-bool FileUtils::CreateDir(char *pszDir)
+bool FileUtils::CreateDirAsc(char *pszDir)
 {
 	int nRet = 0;
 #if defined(_WIN32) || defined(_WIN64)
-	nRet = mkdir(pszDir);
+	#if defined(_USE_WIN32_API)
+		nRet = !CreateDirectoryA(pszDir, NULL);
+	#else
+		nRet = mkdir(pszDir);
+	#endif
 #else
 	nRet = mkdir(pszDir, S_IRWXU | S_IRWXG | S_IRWXO);
 #endif
 	return 0 == nRet;
 }
 
-bool FileUtils::CreateDirs(const char *pszDir)
+#if defined(_WIN32) || defined(_WIN64)
+bool FileUtils::CreateDirUni(FILE_UNI_CHAR_KEYWORD *pszDir)
 {
+	return CreateDirectoryW(pszDir, NULL);
+}
+#endif
+
+bool FileUtils::CreateDirsAsc(const char *pszDir)
+{
+#if  (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+	char chBufPath[MAX_PATH] = { 0 };
+	for (int i = 0; i < MAX_PATH; i++)
+	{
+		if ('\0' == pszDir[i])
+		{
+			break;
+		}
+		else if ('/' == pszDir[i])
+		{
+			chBufPath[i] = '\\';
+		}
+		else
+		{
+			chBufPath[i] = pszDir[i];
+		}
+	}
+	int nRet = SHCreateDirectoryExA(NULL, chBufPath, NULL);
+	if (ERROR_SUCCESS != nRet)
+	{
+		return false;
+	}
+	return true;
+#else
 	int nRet = 0;
 	int nSize = strlen(pszDir);
 	char *pChTmpBuf = new char[nSize];
@@ -141,12 +269,45 @@ bool FileUtils::CreateDirs(const char *pszDir)
 	delete[] pChTmpBuf;
 	pChTmpBuf = NULL;
 	return 0 == nRet;
+#endif
 }
+
+#if  (defined(_WIN32) || defined(_WIN64))
+bool FileUtils::CreateDirsUni(const FILE_UNI_CHAR_KEYWORD *pszDir)
+{
+	FILE_UNI_CHAR_KEYWORD chBufPath[MAX_PATH] = { 0 };
+	for (int i = 0; i < MAX_PATH; i++)
+	{
+		if ('\0' == pszDir[i])
+		{
+			break;
+		}
+		else if ('/' == pszDir[i])
+		{
+			chBufPath[i] = '\\';
+		}
+		else
+		{
+			chBufPath[i] = pszDir[i];
+		}
+	}
+	int nRet = SHCreateDirectoryExW(NULL, chBufPath, NULL);
+	if (ERROR_SUCCESS != nRet)
+	{
+		return false;
+	}
+	return true;;
+}
+#endif
 
 bool FileUtils::FileIsExistAsc(const char *pszFilePath)
 {
+#if  (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+	return PathFileExistsA(pszFilePath);
+#else
 	struct stat statBuf;
 	return (stat(pszFilePath, &statBuf) == 0);
+#endif
 }
 
 #if defined(_WIN32) ||defined(_WIN64)
@@ -158,15 +319,26 @@ bool FileUtils::FileIsExistUni(const FILE_UNI_CHAR_KEYWORD *pszFilePath)
 //#error "Not Support"
 #endif
 
-bool FileUtils::FileDelete(const char *pszFilePath)
+bool FileUtils::FileDeleteAsc(const char *pszFilePath)
 {
+#if  (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+	return DeleteFileA(pszFilePath);
+#else
 	return 0 == remove(pszFilePath);
+#endif
 }
+
+#if  (defined(_WIN32) || defined(_WIN64))
+bool FileUtils::FileDeleteUni(const FILE_UNI_CHAR_KEYWORD *pszFilePath)
+{
+	return DeleteFileW(pszFilePath);
+}
+#endif
 
 bool FileUtils::FileCopy(const char *pszSrcFilePath, const char *pszDstFilePath)
 {
-	FILE *pSrcFile = FileOpenAsc(pszSrcFilePath, FileMode::readMode);
-	FILE *pDstFile = FileOpenAsc(pszDstFilePath, FileMode::newWriteMode);
+	DQFILE pSrcFile = FileOpenAsc(pszSrcFilePath, FileMode::readMode);
+	DQFILE pDstFile = FileOpenAsc(pszDstFilePath, FileMode::newWriteMode);
 	if (NULL == pSrcFile || NULL == pDstFile)
 	{
 		FileClose(pSrcFile);
@@ -218,7 +390,7 @@ bool FileUtils::DirCopy(const char *pszSrcDirPath, const char *pszDstDirPath)
 
 		if (_A_SUBDIR & fileDir.attrib)
 		{
-			CreateDir((char *)strDstFilePath.c_str());
+			CreateDirAsc((char *)strDstFilePath.c_str());
 			DirCopy(strSrcFilePath.c_str(), strDstFilePath.c_str());
 		}
 		else
@@ -265,9 +437,9 @@ bool FileUtils::DirCopy(const char *pszSrcDirPath, const char *pszDstDirPath)
 		return true;
 }
 
-int FileUtils::FileOpenAndRead(const char *pszFilePath, std::string &binFileData)
+int FileUtils::FileOpenAndReadAsc(const char *pszFilePath, std::string &binFileData)
 {
-	FILE *pFile = FileOpenAsc(pszFilePath, FileMode::readMode);
+	DQFILE pFile = FileOpenAsc(pszFilePath, FileMode::readMode);
 	if (NULL == pFile)
 	{
 		return -1;
@@ -296,35 +468,95 @@ int FileUtils::FileOpenAndRead(const char *pszFilePath, std::string &binFileData
 	return 0;
 }
 
-uint32_t FileUtils::FileWrite(const FILE *pFile, const unsigned char *pData, const uint32_t nDataLen)
+#if defined(_WIN32) ||defined(_WIN64)
+int FileUtils::FileOpenAndReadUni(const FILE_UNI_CHAR_KEYWORD *pszFilePath, std::string &binFileData)
 {
-	return fwrite(pData, 1, nDataLen, (FILE *)pFile);
+	DQFILE pFile = FileOpenUni(pszFilePath, FileMode::readMode);
+	if (NULL == pFile)
+	{
+		return -1;
+	}
+	uint64_t un64Size = FileSize(pFile);
+	if (0 == un64Size)
+	{
+		FileClose(pFile);
+		return -2;
+	}
+	binFileData.resize(un64Size);
+	if (un64Size != binFileData.size())
+	{
+		FileClose(pFile);
+		return -3;
+	}
+
+	uint32_t nRead = FileRead(pFile, (unsigned char *)binFileData.data(), un64Size);
+	if (nRead != un64Size)
+	{
+		FileClose(pFile);
+		return -4;
+	}
+
+	FileClose(pFile);
+	return 0;
+}
+#endif
+
+uint32_t FileUtils::FileWrite(const DQFILE pFile, const unsigned char *pData, const uint32_t nDataLen)
+{
+#if (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+	DWORD dwWrite = 0;
+	WriteFile(pFile, pData, nDataLen, &dwWrite, NULL);
+	return dwWrite;
+#else
+	return fwrite(pData, 1, nDataLen, (DQFILE)pFile);
+#endif
 }
 
-uint32_t FileUtils::FileRead(FILE *pFile, unsigned char *pData, uint32_t nDataLen)
+uint32_t FileUtils::FileRead(DQFILE pFile, unsigned char *pData, uint32_t nDataLen)
 {
+#if (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+	DWORD dwRead = 0;
+	ReadFile(pFile, pData, nDataLen, &dwRead, NULL);
+	return dwRead;
+#else
 	return fread(pData, 1, nDataLen, pFile);
+#endif
 }
 
-uint64_t FileUtils::FileSize(FILE *pFile)
+uint64_t FileUtils::FileSize(DQFILE pFile)
 {
 #if defined(_WIN32) || defined(_WIN64)
-	uint64_t nCurPos = _ftelli64(pFile);
-	_fseeki64(pFile, 0L, SEEK_END);
-	uint64_t nFileSize = _ftelli64(pFile);
-	_fseeki64(pFile, nCurPos, SEEK_SET);
+	#if defined(_USE_WIN32_API)
+		uint64_t un64FileSize = 0;
+		LARGE_INTEGER largeInteger = { 0 };
+		BOOL bSuc = GetFileSizeEx(pFile, &largeInteger);
+		if (!bSuc)
+		{
+			return 0;
+		}
+		un64FileSize = largeInteger.QuadPart;
+	#else
+		uint64_t nCurPos = _ftelli64(pFile);
+		_fseeki64(pFile, 0L, SEEK_END);
+		uint64_t un64FileSize = _ftelli64(pFile);
+		_fseeki64(pFile, nCurPos, SEEK_SET);
+	#endif
 #else
 	uint64_t nCurPos = ftello(pFile);
 	fseeko(pFile, 0L, SEEK_END);
-	uint64_t nFileSize = ftello(pFile);
+	uint64_t un64FileSize = ftello(pFile);
 	fseeko(pFile, nCurPos, SEEK_SET);
 #endif
-	return nFileSize;
+	return un64FileSize;
 }
 
-int FileUtils::FileClose(FILE *&pFile)
+int FileUtils::FileClose(DQFILE &pFile)
 {
-	int nRet =  fclose(pFile);
+#if (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+	int nRet = !CloseHandle(pFile);
+#else
+	int nRet = fclose(pFile);
+#endif
 	if (0 == nRet)
 	{
 		pFile = NULL;
@@ -332,12 +564,16 @@ int FileUtils::FileClose(FILE *&pFile)
 	return  nRet;
 }
 
-int FileUtils::FileSeek(FILE *pFile, int32_t unPos, SeekMode nMode)
+int FileUtils::FileSeek(DQFILE pFile, int32_t unPos, SeekMode nMode)
 {
 	int nSeekMode = 0;
 	if (SeekMode::SeekModeBegin == nMode)
 	{
+#if (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+		nSeekMode = FILE_BEGIN;
+#else
 		nSeekMode = SEEK_SET;
+#endif
 		if (unPos < 0)//开始位置，这里肯定不能再往前了
 		{
 			return -1;
@@ -345,7 +581,11 @@ int FileUtils::FileSeek(FILE *pFile, int32_t unPos, SeekMode nMode)
 	}
 	else if (SeekMode::SeekModeCur == nMode)
 	{
+#if (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+		nSeekMode = FILE_CURRENT;
+#else
 		nSeekMode = SEEK_CUR;
+#endif
 	}
 	else if (SeekMode::SeekModeEnd == nMode)
 	{
@@ -353,7 +593,11 @@ int FileUtils::FileSeek(FILE *pFile, int32_t unPos, SeekMode nMode)
 		{
 			return -1;
 		}
+#if (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+		nSeekMode = FILE_END;
+#else
 		nSeekMode = SEEK_END;
+#endif
 	}
 	else
 	{
@@ -361,15 +605,30 @@ int FileUtils::FileSeek(FILE *pFile, int32_t unPos, SeekMode nMode)
 	}
 
 #if defined(_WIN32) || defined(_WIN64)
-	return _fseeki64(pFile, unPos, nSeekMode);
+	#if defined(_USE_WIN32_API)
+		LARGE_INTEGER largeMove = { 0 }, largeNew = {0};
+		largeMove.LowPart = unPos;
+		BOOL bSuc = SetFilePointerEx(pFile, largeMove, &largeNew, nSeekMode);
+		if (!bSuc)
+		{
+			return -1;
+		}
+		return 0;
+	#else
+		return _fseeki64(pFile, unPos, nSeekMode);
+	#endif
 #else
 	return fseeko(pFile, unPos, nSeekMode);
 #endif
 }
 
-int FileUtils::FileFlush(FILE *pFile)
+int FileUtils::FileFlush(DQFILE pFile)
 {
+#if (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+	return !FlushFileBuffers(pFile);
+#else
 	return fflush(pFile);
+#endif
 }
 
 int FileUtils::DirList(std::vector<std::string> &rstVect, const char* pszSrcDirPath, const char *pszExt)
@@ -474,7 +733,18 @@ int FileUtils::DirList(std::vector<std::string> &rstVect, const char* pszSrcDirP
 }
 
 
-int FileUtils::FileRename(const char *pszOldName, const char *pszNewName)
+int FileUtils::FileRenameAsc(const char *pszOldName, const char *pszNewName)
 {
+#if (defined(_WIN32) || defined(_WIN64)) && defined(_USE_WIN32_API)
+	return !MoveFileA(pszOldName, pszNewName);
+#else
 	return rename(pszOldName, pszNewName);
+#endif
 }
+
+#if  (defined(_WIN32) || defined(_WIN64))
+int FileUtils::FileRenameUni(const FILE_UNI_CHAR_KEYWORD *pszOldName, const FILE_UNI_CHAR_KEYWORD *pszNewName)
+{
+	return !MoveFileW(pszOldName, pszNewName);
+}
+#endif
