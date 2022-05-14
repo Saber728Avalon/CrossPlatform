@@ -6,13 +6,15 @@
 
 std::string DQCreateUUID()
 {
-		std::string strUUID;
+	std::string strUUID;
 	GUID guid;
 	HRESULT hr = CoCreateGuid(&guid);
+	char chBufFormat[] = {'%', '0', '8', 'X', '%', '0', '4', 'X', '%', '0', '4', 'X', '%', '0', '2', 'X', '%', '0', '2', 'X', '%', '0', '2', 'X', '%', '0', '2', 'X', '%', '0', '2', 'X', '%', '0', '2', 'X', '%', '0', '2', 'X', '%', '0', '2', 'X', '\0'};
+
 	if (S_OK == hr)
 	{
 		char chBuf[64] = { 0 };
-		sprintf(chBuf,  "%08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X"
+		sprintf(chBuf,  chBufFormat
 			, guid.Data1, guid.Data2, guid.Data3
 			, guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3]
 		, guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]

@@ -66,6 +66,8 @@ set(LoadLibrary_HDRS
 	EncodeChange.h
 	Singleton.h
 	NumberOper.h
+	CPMemory.h
+	CMutex.h
 )
 
 # 添加文件
@@ -78,6 +80,8 @@ set(LoadLibrary_SRC
 	Utf8ToUc2.cpp
 	TransFormCodeFormat.cpp
 	NumberOper.cpp
+	CMutex.cpp
+	CPMemory.cpp
 )
 
 #编译lib

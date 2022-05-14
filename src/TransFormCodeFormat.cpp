@@ -13808,9 +13808,9 @@ int TraditionGbkToUtf8(const U_NIC* gbkSrc, size_t gbkLen, U_TF8* utf8Dest, size
 
 	unsigned short ucs2[100] = { 0 };
 	int indexer = 0;
-	for (auto it : gbkmap)
+	for (auto it = gbkmap.begin(); it != gbkmap.end(); it++)
 	{
-		ucs2[indexer++] = it;
+		ucs2[indexer++] = (*it);
 	}
 	int val = Uc2ToUtf8(ucs2, gbkmap.size(), utf8Dest, utf8Space);
 	delete[]uc2buffermap;
@@ -13885,11 +13885,12 @@ void ToLower(std::string& src)
 	{
 		return;
 	}
-	for (auto&  it: src)
+	
+	for (int i = 0; i < srcSize; i++)
 	{
-		if (it >= 65 && it <= 90)
+		if (src[i] >= 65 && src[i] <= 90)
 		{
-			it = it + 32;
+			src[i] = src[i] + 32;
 		}
 	}
 }
@@ -13900,11 +13901,11 @@ void ToUpper(std::string& src)
 	{
 		return;
 	}
-	for (auto& it : src)
+	for (int i = 0; i < sz; i++)
 	{
-		if (it >= 97 && it <= 122)
+		if (src[i] >= 97 && src[i] <= 122)
 		{
-			it = it - 32;
+			src[i] = src[i] - 32;
 		}
 	}
 }

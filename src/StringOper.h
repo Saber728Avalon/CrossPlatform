@@ -26,13 +26,16 @@
 #pragma error "Not Support"
 #endif
 
-class StringOper
+namespace CP
 {
-public:
-	~StringOper();
+
+	class StringOper
+	{
+	public:
+		~StringOper();
 
 
-	/**
+		/**
 		* @brief     分割ascii字符串
 		* @note      
 		* @returns   分割结果
@@ -42,12 +45,12 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/08/18
-	*/
-	static std::vector<std::string> StringSplitAsc(const std::string &strSrc, std::vector<char> vectSplitChar);
+		*/
+		static std::vector<std::string> StringSplitAsc(const std::string &strSrc, std::vector<char> vectSplitChar);
 
 
 
-	/**
+		/**
 		* @brief     分割unicode字符串
 		* @note      
 		* @returns   分割结果
@@ -57,11 +60,11 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/08/18
-	*/
-	static std::vector<std::wstring> StringSplitUni(const std::wstring &strSrc, std::vector<UNI_CHAR_KEYWORD> vectSplitChar);
+		*/
+		static std::vector<std::wstring> StringSplitUni(const std::wstring &strSrc, std::vector<UNI_CHAR_KEYWORD> vectSplitChar);
 
 
-	/**
+		/**
 		* @brief     将ascii字符串转为大写
 		* @note      
 		* @returns   转换后的结果
@@ -69,12 +72,12 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/08/19
-	*/
-	static std::string ToUpperCaseAsc(std::string strSrc);
+		*/
+		static std::string ToUpperCaseAsc(std::string strSrc);
 
 
 
-	/**
+		/**
 		* @brief     将unicode字符串转为大写
 		* @note      
 		* @returns   转换后的结果
@@ -82,11 +85,11 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/08/19
-	*/
-	static std::wstring ToUpperCaseUni(std::wstring strSrc);
+		*/
+		static std::wstring ToUpperCaseUni(std::wstring strSrc);
 
 
-	/**
+		/**
 		* @brief     将ascii字符串转为小写
 		* @note      
 		* @returns   转换后的结果
@@ -94,12 +97,12 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/08/19
-	*/
-	static std::string ToLowerCaseAsc(std::string strSrc);
+		*/
+		static std::string ToLowerCaseAsc(std::string strSrc);
 
 
 
-	/**
+		/**
 		* @brief     将unicode字符串转为小写
 		* @note      
 		* @returns   转换后的结果
@@ -107,11 +110,11 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/08/19
-	*/
-	static std::wstring ToLowerCaseUni(std::wstring strSrc);
+		*/
+		static std::wstring ToLowerCaseUni(std::wstring strSrc);
 
 
-	/**
+		/**
 		* @brief     判断asc字符串是否以前缀开头
 		* @note      
 		* @returns   bool
@@ -120,10 +123,10 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/08/19
-	*/
-	static bool StartWithAsc(const std::string &strSrc, const std::string &strPrefix);
+		*/
+		static bool StartWithAsc(const std::string &strSrc, const std::string &strPrefix);
 
-	/**
+		/**
 		* @brief     判断unicode字符串是否以前缀开头
 		* @note      
 		* @returns   匹配成功为ture, 匹配失败为false 
@@ -132,10 +135,10 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/08/19
-	*/
-	static bool StartWithUni(const std::wstring &strSrc, const std::wstring &strPrefix);
+		*/
+		static bool StartWithUni(const std::wstring &strSrc, const std::wstring &strPrefix);
 
-	/**
+		/**
 		* @brief     判断asc字符串是否以前缀结尾
 		* @note      
 		* @returns   匹配成功为ture, 匹配失败为false 
@@ -144,10 +147,10 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/08/19
-	*/
-	static bool EndWithAsc(const std::string &strSrc, const std::string &strSufffix);
+		*/
+		static bool EndWithAsc(const std::string &strSrc, const std::string &strSufffix);
 
-	/**
+		/**
 		* @brief     判断unicode字符串是否以前缀结尾
 		* @note      
 		* @returns   匹配成功为ture, 匹配失败为false 
@@ -156,11 +159,11 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/08/19
-	*/
-	static bool EndWithUni(const std::wstring &strSrc, const std::wstring &strSufffix);
+		*/
+		static bool EndWithUni(const std::wstring &strSrc, const std::wstring &strSufffix);
 
 
-	/**
+		/**
 		* @brief     格式化ascii字符串
 		* @note      
 		* @returns   返回ascii字符串
@@ -169,10 +172,10 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/08/19
-	*/
-	static std::string FormatAsc(const char *fmt, ...);
+		*/
+		static std::string FormatAsc(const char *fmt, ...);
 
-	/**
+		/**
 		* @brief     格式化unicode字符串
 		* @note      
 		* @returns   返回unicode字符串
@@ -181,11 +184,11 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/08/19
-	*/
-	static std::wstring FormatUni(const UNI_CHAR_KEYWORD *fmt, ...);
+		*/
+		static std::wstring FormatUni(const UNI_CHAR_KEYWORD *fmt, ...);
 
 
-	/**
+		/**
 		* @brief     去掉ascii左边空格
 		* @note      
 		* @returns   std::string
@@ -193,11 +196,11 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/08/28
-	*/
-	static std::string LeftTrimAsc(const std::string strSrc);
+		*/
+		static std::string LeftTrimAsc(const std::string strSrc);
 
 
-	/**
+		/**
 		* @brief     去掉ascii右边空格
 		* @note      
 		* @returns   std::string
@@ -205,11 +208,11 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/08/28
-	*/
-	static std::string RightTrimAsc(const std::string strSrc);
+		*/
+		static std::string RightTrimAsc(const std::string strSrc);
 
 
-	/**
+		/**
 		* @brief     去掉unicode左边空格
 		* @note      
 		* @returns   std::wstring
@@ -217,11 +220,11 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/08/28
-	*/
-	static std::wstring LeftTrimUni(const std::wstring strSrc);
+		*/
+		static std::wstring LeftTrimUni(const std::wstring strSrc);
 
 
-	/**
+		/**
 		* @brief      去掉unicode右边空格
 		* @note      
 		* @returns   std::wstring
@@ -229,12 +232,12 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/08/28
-	*/
-	static std::wstring RightTrimUni(const std::wstring strSrc);
+		*/
+		static std::wstring RightTrimUni(const std::wstring strSrc);
 
 
 
-	/**
+		/**
 		* @brief     去掉ascii两边空格
 		* @note      
 		* @returns   std::string
@@ -242,12 +245,12 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/08/28
-	*/
-	static std::string TrimAsc(const std::string strSrc);
+		*/
+		static std::string TrimAsc(const std::string strSrc);
 
 
 
-	/**
+		/**
 		* @brief      去掉unicode两边空格
 		* @note      
 		* @returns   std::wstring
@@ -255,11 +258,11 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/08/28
-	*/
-	static std::wstring TrimUni(const std::wstring strSrc);
+		*/
+		static std::wstring TrimUni(const std::wstring strSrc);
 
 
-	/**
+		/**
 		* @brief     反向查找ascii字符串，只要有一个字符找到,则返回.主要用于查找多个多个结尾的情况。比如文件路径结尾可能是\,也可能是/
 		* @note      
 		* @returns   uint32_t
@@ -268,11 +271,11 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/09/21
-	*/
-	static int RFindOrStringAsc(const std::string strSrc, const std::string strObj);
+		*/
+		static int RFindOrStringAsc(const std::string strSrc, const std::string strObj);
 
 
-	/**
+		/**
 		* @brief     反向查找unicode字符串，只要有一个字符找到,则返回.主要用于查找多个多个结尾的情况。比如文件路径结尾可能是\,也可能是/
 		* @note      
 		* @returns   uint32_t
@@ -281,11 +284,11 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2020/09/21
-	*/
-	static int RFindOrStringUni(const std::wstring strSrc, const std::wstring strObj);
-	
-	
-	/**
+		*/
+		static int RFindOrStringUni(const std::wstring strSrc, const std::wstring strObj);
+
+
+		/**
 		* @brief     ascii字符串进行替换
 		* @note      如果没有可以替换的目标串，则不会替换
 		* @returns   替换结果
@@ -295,11 +298,11 @@ public:
 		* @code
 		* @endcode
 		* @since     2020/12/08
-	*/
-	static std::string ReplaceAsc(std::string strSrc, std::string strObj, std::string strReplace);
+		*/
+		static std::string ReplaceAsc(std::string strSrc, std::string strObj, std::string strReplace);
 
 
-	/**
+		/**
 		* @brief     ascii字符串进行替换,但是只是替换一次
 		* @note       如果没有可以替换的目标串，则不会替换
 		* @returns   替换结果
@@ -309,37 +312,37 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2021/11/30
-	*/
-	static std::string ReplaceFirstAsc(std::string strSrc, std::string strObj, std::string strReplace);
+		*/
+		static std::string ReplaceFirstAsc(std::string strSrc, std::string strObj, std::string strReplace);
 
-	/**
-	* @brief     unicode字符串进行替换
-	* @note		 如果没有可以替换的目标串，则不会替换
-	* @returns   替换结果
-	* @param[in] strSrc 替换的原始字符串
-	* @param[in] strObj 替换的目标串
-	* @param[in] strReplace 替换的结果串
-	* @code
-	* @endcode
-	* @since     2020/12/08
-	*/
-	static std::wstring ReplaceUni(std::wstring strSrc, std::wstring strObj, std::wstring strReplace);
+		/**
+		* @brief     unicode字符串进行替换
+		* @note		 如果没有可以替换的目标串，则不会替换
+		* @returns   替换结果
+		* @param[in] strSrc 替换的原始字符串
+		* @param[in] strObj 替换的目标串
+		* @param[in] strReplace 替换的结果串
+		* @code
+		* @endcode
+		* @since     2020/12/08
+		*/
+		static std::wstring ReplaceUni(std::wstring strSrc, std::wstring strObj, std::wstring strReplace);
 
-	/**
-	* @brief     unicode字符串进行替换,但是只是替换一次
-	* @note		 如果没有可以替换的目标串，则不会替换
-	* @returns   替换结果
-	* @param[in] strSrc 替换的原始字符串
-	* @param[in] strObj 替换的目标串
-	* @param[in] strReplace 替换的结果串
-	* @code
-	* @endcode
-	* @since     2020/12/08
-	*/
-	static std::wstring ReplaceFirstUni(std::wstring strSrc, std::wstring strObj, std::wstring strReplace);
+		/**
+		* @brief     unicode字符串进行替换,但是只是替换一次
+		* @note		 如果没有可以替换的目标串，则不会替换
+		* @returns   替换结果
+		* @param[in] strSrc 替换的原始字符串
+		* @param[in] strObj 替换的目标串
+		* @param[in] strReplace 替换的结果串
+		* @code
+		* @endcode
+		* @since     2020/12/08
+		*/
+		static std::wstring ReplaceFirstUni(std::wstring strSrc, std::wstring strObj, std::wstring strReplace);
 
 
-	/**
+		/**
 		* @brief     判断ASCII字符串是否全部是数字
 		* @note      
 		* @returns   true全部是数字，否则false
@@ -347,11 +350,11 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2021/07/01
-	*/
-	static bool IsDigitalAsc(const std::string &strSrc);
+		*/
+		static bool IsDigitalAsc(const std::string &strSrc);
 
 
-	/**
+		/**
 		* @brief     判断UNICODE字符串是否全部是数字
 		* @note      
 		* @returns   true全部是数字，否则false
@@ -359,10 +362,10 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2021/07/01
-	*/
-	static bool IsDigitalUni(const std::wstring &strSrc);
+		*/
+		static bool IsDigitalUni(const std::wstring &strSrc);
 
-	/**
+		/**
 		* @brief    将std;:string字符串,变成同时支持C/C++两个形式的字符串
 		* @note     由于c++的string是支持存放二进制数据的。这就导致了 字符串abcd'\0' 和abcd 二者是不同的。此函数，通过模仿C++字符串处理。故意将预留空间变大。用来保持前面说的是同一个字符串
 		* @returns   std::string
@@ -370,10 +373,10 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2021/07/02
-	*/
-	static std::string  CppAndCStrAsc(const std::string & strSrc);
+		*/
+		static std::string  CppAndCStrAsc(const std::string & strSrc);
 
-	/**
+		/**
 		* @brief     将std;:wstring字符串,变成同时支持C/C++两个形式的字符串
 		* @note      由于c++的string是支持存放二进制数据的。这就导致了 字符串abcd'\0' 和abcd 二者是不同的。此函数，通过模仿C++字符串处理。故意将预留空间变大。用来保持前面说的是同一个字符串
 		* @returns   std::wstring
@@ -381,11 +384,11 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2021/07/02
-	*/
-	static std::wstring  CppAndCStrUni(const std::wstring & strSrc);
+		*/
+		static std::wstring  CppAndCStrUni(const std::wstring & strSrc);
 
 
-	/**
+		/**
 		* @brief     string 转换为 wstring 
 		* @note      
 		* @returns   std::wstring
@@ -393,11 +396,11 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2021/08/18
-	*/
-	static std::wstring c2w(const char *pc);
+		*/
+		static std::wstring c2w(const char *pc);
 
 
-	/**
+		/**
 		* @brief     wstring 转换为 string
 		* @note      
 		* @returns   std::string
@@ -405,11 +408,11 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2021/08/18
-	*/
-	static std::string w2c(const UNI_CHAR_KEYWORD * pw);
+		*/
+		static std::string w2c(const UNI_CHAR_KEYWORD * pw);
 
 
-	/**
+		/**
 		* @brief     不区分大小写比较字符串
 		* @note      
 		* @returns   int
@@ -418,11 +421,11 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2021/08/24
-	*/
-	static int StrNiCmp(const char *pszSrc, const char *pszDst);
+		*/
+		static int StrNiCmp(const char *pszSrc, const char *pszDst);
 
 
-	/**
+		/**
 		* @brief      不区分大小写比较字符串
 		* @note      
 		* @returns   int
@@ -432,10 +435,10 @@ public:
 		* @code      
 		* @endcode    
 		* @since     2021/08/24
-	*/
-	static int StrNiCmp(const char *pszSrc, const char *pszDst, int nLen);
+		*/
+		static int StrNiCmp(const char *pszSrc, const char *pszDst, int nLen);
 
-private:
-	StringOper();
-};
-
+	private:
+		StringOper();
+	};
+}
